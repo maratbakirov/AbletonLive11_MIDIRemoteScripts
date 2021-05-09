@@ -1,4 +1,5 @@
 #Embedded file name: /Users/versonator/Jenkins/live/output/Live/mac_64_static/Release/python-bundle/MIDI Remote Scripts/Novation_Impulse/Novation_Impulse.py
+# Novation_Impulse2
 from __future__ import absolute_import, print_function, unicode_literals
 from __future__ import division
 from builtins import str
@@ -45,6 +46,7 @@ class Novation_Impulse2(ControlSurface):
 
     def __init__(self, c_instance):
         ControlSurface.__init__(self, c_instance)
+        self.c_instance = c_instance
         with self.component_guard():
             self.set_pad_translations(PAD_TRANSLATIONS)
             self._suggested_input_port = u'Impulse'
@@ -52,6 +54,10 @@ class Novation_Impulse2(ControlSurface):
             self._has_sliders = True
             self._current_midi_map = None
             self._display_reset_delay = -1
+            self._string_to_display = None
+            self.shift_pressed = False
+            # special alternative buttons mode. for now only mixer buttons become record buttons. later we will add something more
+            self.alternative_buttons_mode = False
             self._shift_button = ButtonElement(IS_MOMENTARY, MIDI_CC_TYPE, 0, 39)
             self._preview_button = ButtonElement(IS_MOMENTARY, MIDI_CC_TYPE, 0, 41)
             self._master_slider = SliderElement(MIDI_CC_TYPE, 0, 8)
@@ -70,9 +76,24 @@ class Novation_Impulse2(ControlSurface):
             mixer_button.name = u'Encoder_Mixer_Mode'
             self._encoder_modes = EncoderModeSelector(self._device_component, self._mixer, self._next_bank_button, self._prev_bank_button, self._encoders)
             self._encoder_modes.set_device_mixer_buttons(device_button, mixer_button)
-            self._string_to_display = None
+            self._shift_button.add_value_listener(self._shift_button_handler)
             for component in self.components:
                 component.set_enabled(False)
+
+    # attributes
+    def alternative_buttons_mode(self):
+        return self.alternative_buttons_mode
+
+    def alternative_buttons_mode(self,value):
+        self.log('alternative_buttons_mode_value ' + str(value))
+        self.alternative_buttons_mode = value
+
+    def shift_pressed(self):
+        return self.shift_pressed
+
+    def shift_pressed(self,value):
+        self.log ('shift_pressed value ' + str(value))
+        self.shift_pressed = value
 
     def refresh_state(self):
         ControlSurface.refresh_state(self)
@@ -125,13 +146,16 @@ class Novation_Impulse2(ControlSurface):
         self._strip_buttons = None
         self._master_slider = None
         self._current_midi_map = None
-        self._shift_button = None
         self._name_display = None
         self._prev_bank_button = None
         self._next_bank_button = None
         self._encoder_modes = None
         self._transport_view_modes = None
         self._send_midi(SYSEX_START + (6, 0, 0, 0, 247))
+        if self._shift_button != None:
+            self._shift_button.remove_value_listener(self._shift_button_handler)
+            self._shift_button = None
+        return
 
     def build_midi_map(self, midi_map_handle):
         self._current_midi_map = midi_map_handle
@@ -155,7 +179,8 @@ class Novation_Impulse2(ControlSurface):
         mute_solo_flip_button.name = u'Mute_Solo_Flip_Button'
         self._next_nav_button.name = u'Next_Track_Button'
         self._prev_nav_button.name = u'Prev_Track_Button'
-        self._mixer = SpecialMixerComponent(8)
+        #self._mixer = SpecialMixerComponent(8)
+        self._mixer = SpecialMixerComponent(self, 8, self.c_instance)
         self._mixer.name = u'Mixer'
         self._mixer.set_select_buttons(self._next_nav_button, self._prev_nav_button)
         self._mixer.selected_strip().name = u'Selected_Channel_Strip'
@@ -177,6 +202,8 @@ class Novation_Impulse2(ControlSurface):
 
         self._mixer.master_strip().set_mute_button(ButtonElement(IS_MOMENTARY, MIDI_CC_TYPE, 1, 17))
         self._mixer.set_strip_mute_solo_buttons(tuple(self._strip_buttons), mute_solo_flip_button)
+        self._mixer.updateMixerButtons()
+        self._button9 = ButtonElement(IS_MOMENTARY, MIDI_CC_TYPE, 0, 9 + 8)
 
     def _setup_session(self):
         num_pads = len(PAD_TRANSLATIONS)
@@ -214,13 +241,14 @@ class Novation_Impulse2(ControlSurface):
         play_button.name = u'Play_Button'
         stop_button.name = u'Stop_Button'
         rec_button.name = u'Record_Button'
-        transport = ShiftableTransportComponent()
-        transport.name = u'Transport'
-        transport.set_stop_button(stop_button)
-        transport.set_play_button(play_button)
-        transport.set_record_button(rec_button)
-        transport.set_shift_button(self._shift_button)
-        self._transport_view_modes = TransportViewModeSelector(transport, self._session, ffwd_button, rwd_button, loop_button)
+        self._transport = ShiftableTransportComponent(self.c_instance,self._session, self, ffwd_button, rwd_button)
+        self._transport.name = u'Transport'
+        self._transport.set_stop_buttonOnInit(stop_button)
+        self._transport.set_play_button(play_button)
+        self._transport.set_record_buttonOnInit(rec_button)
+#        self._transport.set_shift_button(self._shift_button)
+        self._transport.set_mixer9_button(self._button9)
+        self._transport_view_modes = TransportViewModeSelector(self,self.c_instance,self._transport, self._session, ffwd_button, rwd_button, loop_button)
         self._transport_view_modes.name = u'Transport_View_Modes'
 
     def _setup_device(self):
@@ -297,6 +325,31 @@ class Novation_Impulse2(ControlSurface):
                 self._display_reset_delay = STANDARD_DISPLAY_DELAY
             else:
                 self._set_string_to_display(u' - ')
+        # if shift_pressed XOR alternative_mode
+        if self.shift_pressed != self.alternative_buttons_mode:
+            self.log("_mixer_button_value")
+            self.log(str(value))
+            if (value == 0):
+                self.select_armed_track_if_only_one()
+        return
+
+    def select_armed_track_if_only_one(self):
+        self.log("select_armed_track_if_only_one")
+        song = self.song()
+        armed_tracks = []
+        tracks = song.tracks
+        self.log("select_armed_track_if_only_one 2")
+        for track in tracks:
+            if track.can_be_armed and track.arm:
+                armed_tracks.append(track)
+        self.log(str(len(armed_tracks)))
+        if (len(armed_tracks) == 1):
+            self.log("selecting the track")
+            sel_track = armed_tracks[0]
+            self.song().view.selected_track = sel_track
+            self._mixer._selected_tracks = []
+            self._mixer._selected_tracks.append(sel_track)
+            self._mixer.on_selected_track_changed()
 
     def _preview_value(self, value):
         assert value in range(128)
@@ -331,3 +384,48 @@ class Novation_Impulse2(ControlSurface):
                 new_offset = track_index - track_index % num_strips
                 assert old_div(new_offset, num_strips) == int(old_div(new_offset, num_strips))
                 self._session.set_offsets(new_offset, self._session.scene_offset())
+
+    def _shift_button_handler(self, value):
+        self.log("root shift handler : "+ str(value))
+        if not self._shift_button != None:
+            raise AssertionError
+        if not value in range(128):
+            raise AssertionError
+        self.log("root shift handler 2")
+        self.shift_pressed = value > 0
+# calling other handlers
+        self._mixer._shift_button_handler(value)
+        self._transport._shift_button_handler(value)
+        self._transport_view_modes._shift_button_handler(value)
+
+#clip stop
+        self.log("root shift handler 3")
+        num_pads = len(PAD_TRANSLATIONS)
+        pads = []
+        for index in range(num_pads):
+            pads.append(ButtonElement(IS_MOMENTARY, MIDI_CC_TYPE, 0, 60 + index))
+            pads[-1].name = 'Pad_' + str(index)
+            clip_slot = self._session.selected_scene().clip_slot(index)
+            if self.shift_pressed:
+                clip_slot.set_launch_button(None)
+            else:
+                clip_slot.set_launch_button(pads[index])
+        if self.shift_pressed:
+            self._session.set_stop_track_clip_buttons(tuple(pads))
+        else:
+            self._session.set_stop_track_clip_buttons(None)
+
+        self.log("root shift handler 4")
+
+    def flipAlternativeButtonMode(self):
+        self.alternative_buttons_mode = not self.alternative_buttons_mode
+        self.updateAlternativeButtonMode()
+
+    def updateAlternativeButtonMode(self):
+        self._mixer.updateMixerButtons()
+        self._transport_view_modes.update()
+
+    def log(self, message):
+        pass
+#	    self.c_instance.log_message(message)
+

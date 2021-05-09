@@ -26,14 +26,14 @@ Shift + Mixer  button 9  = Automation record on/off
 Shift + Rec  = Metronome on/off
 Shift + Play = Undo
 Shift + Stop = Stop all clips
-Shift + Ffwd/Back  - next/previous device ?? to investigate if it works still
+Shift + Ffwd/Back  - next/previous device
 
 Shift + Loop now enters "alternative assignments" mode.
 Differences:
   is that mixer buttons are permanently armed (like the shift is pressed)
   if you press Shift and arm the track, it will NOT me selected automatically
 
-It is very good for perfomance when you need to quickly switch instruments and only have one left hand or right hand available as the other is ready to play
+It is very good for performance when you need to quickly switch instruments and only have one left hand or right hand available as the other is ready to play
 
 Shift + Clip buttons are now clip stop
 
@@ -43,8 +43,8 @@ Known issues that cannot be fixed
 1) After moving track with Shift+Track buttons are not returned to inital condition.
     Also happens sometimes in other cases (like bank switching with Shift).
    Workaround - press and release Shit again.
-  update : seems to work fine with Nocation Firmware 695 and higher
-2) Pressin shift + (mutes/solos) flip button leds to unpredictable results.
+  update : seems to work fine with Novation Firmware 695 and higher
+2) Pressing shift + (mutes/solos) flip button leads to unpredictable results.
    Workaround - do not do that, if you have done that, just press and release shift.
 
 The reason for these problems is that when you use shift+track or shift+bank, the message "shift off" is not sent.

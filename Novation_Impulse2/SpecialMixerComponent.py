@@ -7,35 +7,27 @@ from _Framework.ButtonElement import ButtonElement
 class SpecialMixerComponent(MixerComponent):
     u""" Special mixer class that reassigns buttons to mute or solo based on a toggle """
 
-    def __init__(self, num_tracks):
-        self._shift_button = None
+    def __init__(self, parent, num_tracks, c_instance):
+        self.parent = parent
+        self.c_instance = c_instance
+        self.log("mixer.init")
         self._selected_mute_solo_button = None
         self._strip_mute_solo_buttons = None
         self._mute_solo_flip_button = None
         MixerComponent.__init__(self, num_tracks)
         self._selected_tracks = []
         self._register_timer_callback(self._on_timer)
+        self._mute_solo_raw_value = 127
 
     def disconnect(self):
         self._unregister_timer_callback(self._on_timer)
         self._selected_tracks = None
         MixerComponent.disconnect(self)
-        if self._shift_button != None:
-            self._shift_button.remove_value_listener(self._shift_value)
-            self._shift_button = None
         if self._mute_solo_flip_button != None:
             self._mute_solo_flip_button.remove_value_listener(self._mute_solo_flip_value)
             self._mute_solo_flip_button = None
         self._selected_mute_solo_button = None
         self._strip_mute_solo_buttons = None
-
-    def set_shift_button(self, shift_button):
-        assert shift_button == None or shift_button.is_momentary()
-        if self._shift_button != None:
-            self._shift_button.remove_value_listener(self._shift_value)
-        self._shift_button = shift_button
-        if self._shift_button != None:
-            self._shift_button.add_value_listener(self._shift_value)
 
     def set_selected_mute_solo_button(self, button):
         assert isinstance(button, (type(None), ButtonElement))
@@ -63,28 +55,46 @@ class SpecialMixerComponent(MixerComponent):
     def tracks_to_use(self):
         return tuple(self.song().visible_tracks) + tuple(self.song().return_tracks)
 
-    def _shift_value(self, value):
-        assert self._shift_button != None
-        assert value in range(128)
-        if value > 0:
-            self.selected_strip().set_mute_button(None)
-            self.selected_strip().set_solo_button(self._selected_mute_solo_button)
-        else:
-            self.selected_strip().set_solo_button(None)
-            self.selected_strip().set_mute_button(self._selected_mute_solo_button)
+    def _shift_button_handler(self, value):
+        self.log("calling mixer shift value " + str(value))
+        self.updateMixerButtons()
+        pass
+        return
 
     def _mute_solo_flip_value(self, value):
-        assert self._mute_solo_flip_button != None
-        assert value in range(128)
+        self.log("_mute_solo_flip_value" + str(value))
+        if not self._mute_solo_flip_button != None:
+            raise AssertionError
+        if not value in range(128):
+            raise AssertionError
+        self._mute_solo_raw_value = value
+        self.updateMixerButtons()
+        return
+
+    def updateMixerButtons(self):
+        parent_shift_pressed = self.parent.shift_pressed
+        parent_alternative_buttons_mode = self.parent.alternative_buttons_mode
+        self.log("updateMixerButtons " + str(parent_shift_pressed) + " " +str(parent_alternative_buttons_mode))
         if self._strip_mute_solo_buttons != None:
             for index in range(len(self._strip_mute_solo_buttons)):
                 strip = self.channel_strip(index)
-                if value == 0:
-                    strip.set_mute_button(None)
-                    strip.set_solo_button(self._strip_mute_solo_buttons[index])
+                self.log("setting strip")
+                if self.parent.shift_pressed or self.parent.alternative_buttons_mode:
+                        self.log("setting strip to arm")
+                        strip.set_mute_button(None)
+                        strip.set_solo_button(None)
+                        strip.set_arm_button(self._strip_mute_solo_buttons[index])
                 else:
-                    strip.set_solo_button(None)
-                    strip.set_mute_button(self._strip_mute_solo_buttons[index])
+                    if self._mute_solo_raw_value == 0:
+                        self.log("setting strip to solo")
+                        strip.set_mute_button(None)
+                        strip.set_solo_button(self._strip_mute_solo_buttons[index])
+                        strip.set_arm_button(None)
+                    else:
+                        self.log("setting strip to mute")
+                        strip.set_solo_button(None)
+                        strip.set_mute_button(self._strip_mute_solo_buttons[index])
+                        strip.set_arm_button(None)
 
     def _on_timer(self):
         sel_track = None
@@ -130,3 +140,9 @@ class SpecialMixerComponent(MixerComponent):
     def _prev_track_value(self, value):
         MixerComponent._prev_track_value(self, value)
         self._selected_tracks.append(self.song().view.selected_track)
+        self.updateMixerButtons()
+
+    def log(self, message):
+        pass
+#	    self.c_instance.log_message(message)
+

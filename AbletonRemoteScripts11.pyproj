@@ -83,20 +83,6 @@
     <Compile Include="_Generic\SelectChanStripComponent.py" />
     <Compile Include="_Generic\SpecialMixerComponent.py" />
     <Compile Include="_Generic\__init__.py" />
-    <Compile Include="_V9\Novation_Impulse2\EncoderModeSelector.py" />
-    <Compile Include="_V9\Novation_Impulse2\Novation_Impulse2.py" />
-    <Compile Include="_V9\Novation_Impulse2\PeekableEncoderElement.py" />
-    <Compile Include="_V9\Novation_Impulse2\ShiftableTransportComponent.py" />
-    <Compile Include="_V9\Novation_Impulse2\SpecialMixerComponent.py" />
-    <Compile Include="_V9\Novation_Impulse2\TransportViewModeSelector.py" />
-    <Compile Include="_V9\Novation_Impulse2\__init__.py" />
-    <Compile Include="_V9\Novation_Impulse\EncoderModeSelector.py" />
-    <Compile Include="_V9\Novation_Impulse\Novation_Impulse.py" />
-    <Compile Include="_V9\Novation_Impulse\PeekableEncoderElement.py" />
-    <Compile Include="_V9\Novation_Impulse\ShiftableTransportComponent.py" />
-    <Compile Include="_V9\Novation_Impulse\SpecialMixerComponent.py" />
-    <Compile Include="_V9\Novation_Impulse\TransportViewModeSelector.py" />
-    <Compile Include="_V9\Novation_Impulse\__init__.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Novation_Impulse2" />
@@ -104,16 +90,12 @@
     <Folder Include="_Framework\" />
     <Folder Include="_Generic\" />
     <Folder Include="_V9\" />
-    <Folder Include="_V9\Novation_Impulse2\" />
-    <Folder Include="_V9\Novation_Impulse\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Novation_Impulse2\deploy.bat" />
     <Content Include="Novation_Impulse2\readme.md" />
     <Content Include="Novation_Impulse2\_debug.bat" />
-    <Content Include="_V9\Novation_Impulse2\debug.bat" />
-    <Content Include="_V9\Novation_Impulse2\deploy.bat" />
-    <Content Include="_V9\Novation_Impulse2\readme.txt" />
+    <Content Include="README.md" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
 </Project>
