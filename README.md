@@ -7,7 +7,7 @@ extract the zip to the
 
 "C:\ProgramData\Ableton\Live 11 [Suite]\Resources\MIDI Remote Scripts" 
 
-@ Discussion
+# Discussion
 https://forum.ableton.com/viewtopic.php?f=1&t=197828
 
 # Releases
