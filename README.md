@@ -1,24 +1,22 @@
-Created by Marat Bakirov 2013-2021
-Discussion
+# installation 
+please download from the folder 
+
+https://github.com/maratbakirov/AbletonLive11_MIDIRemoteScripts/releases
+
+extract the zip to the 
+
+"C:\ProgramData\Ableton\Live 11 [Suite]\Resources\MIDI Remote Scripts" 
+
+@ Discussion
 https://forum.ableton.com/viewtopic.php?f=1&t=197828
 
-Releases:
+# Releases
 
 Ableton 11:
 https://github.com/maratbakirov/AbletonLive11_MIDIRemoteScripts/releases
 
 
-Ableton 10:
-https://github.com/maratbakirov/AbletonLive10_MIDIRemoteScripts/releases
-
-Ableton 9:
-https://github.com/maratbakirov/AbletonLive9_RemoteScripts/releases
-Novation_Impulse2_9_1.zip is for older versions 
-Novation_Impulse2.zip
-is for newer versions
-
-
-Features
+# Features
 
 Mixer  button 9 = OverDub
 Shift + Mixer  button 9  = Automation record on/off
@@ -97,21 +95,15 @@ this file made it not possible to clone the repo on windows
 # Original readme at 
 # https://github.com/gluon/AbletonLive11_MIDIRemoteScripts
 
-# Ableton Live 11 (beta) MIDI Remote Scripts 
 
-Unofficial repository for Ableton Live 11 MIDI Remote Scripts Python Sources decompiled by Julien Bayle
+# All related projects:
+https://github.com/maratbakirov/AbletonLive9_RemoteScripts
+https://github.com/maratbakirov/AbletonLive9_RemoteScripts/releases
 
-You can find more informations on this page :
-https://structure-void.com/ableton-live-midi-remote-scripts/
+https://github.com/maratbakirov/AbletonLive10_MIDIRemoteScripts
+https://github.com/maratbakirov/AbletonLive10_MIDIRemoteScripts/releases
 
-You can read the PythonLiveAPI extracted documentation :
-https://structure-void.com/PythonLiveAPI_documentation/Live11.0.xml
+https://github.com/maratbakirov/AbletonLive11_MIDIRemoteScripts
+https://github.com/maratbakirov/AbletonLive11_MIDIRemoteScripts/releases
 
-## UPDATED on 4th December 2020
-
-===> **NO support given, ONLY source files !**
-
-===> **Don't contact Ableton for support about this repository**
-
-Please enjoy.
 
