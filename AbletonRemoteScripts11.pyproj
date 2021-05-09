@@ -108,9 +108,9 @@
     <Folder Include="_V9\Novation_Impulse\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Novation_Impulse2\debug.bat" />
     <Content Include="Novation_Impulse2\deploy.bat" />
-    <Content Include="Novation_Impulse2\readme.txt" />
+    <Content Include="Novation_Impulse2\readme.md" />
+    <Content Include="Novation_Impulse2\_debug.bat" />
     <Content Include="_V9\Novation_Impulse2\debug.bat" />
     <Content Include="_V9\Novation_Impulse2\deploy.bat" />
     <Content Include="_V9\Novation_Impulse2\readme.txt" />

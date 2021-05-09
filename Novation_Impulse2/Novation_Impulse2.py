@@ -40,7 +40,7 @@ GREEN_BLINK = 56
 AMBER_FULL = RED_FULL + GREEN_FULL - 4
 AMBER_BLINK = AMBER_FULL - 4 + 8
 
-class Novation_Impulse(ControlSurface):
+class Novation_Impulse2(ControlSurface):
     u""" Script for Novation's Impulse keyboards """
 
     def __init__(self, c_instance):

@@ -3,8 +3,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 from .Novation_Impulse2 import Novation_Impulse2
 
 def create_instance(c_instance):
-    return Novation_Impulse(c_instance)
-
+    return Novation_Impulse2(c_instance)
 
 from _Framework.Capabilities import *
 
